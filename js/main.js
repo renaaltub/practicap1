@@ -271,7 +271,40 @@ function disminuirCantidad(id) {
     }
 }
 
+//ej 8, ordenar frutas por precio de menor a mayor y de mayor a menor y de az y za
 
+function ordenarFrutas(){
+    const btnAz = document.getElementById("btn-ordenar-az");
+    const btnZa = document.getElementById("btn-ordenar-za");
+    const btnPrecioAsc = document.getElementById("btn-ordenar-preciomenor");
+    const btnPrecioDesc = document.getElementById("btn-ordenar-preciomayor");
+    //condicionales para q no tire error si no encuentra los botones
+    if (btnAz){
+        btnAz.addEventListener("click", () => { // Ordenar de A a Z
+            const frutasOrdenadas = [...frutas].sort((a, b) => a.nombre.localeCompare(b.nombre));
+            cargarFrutas(frutasOrdenadas);
+        });
+    }
+    if (btnZa){
+        btnZa.addEventListener("click", () => { // Ordenar de Z a A
+            const frutasOrdenadas = [...frutas].sort((a, b) => b.nombre.localeCompare(a.nombre));
+            cargarFrutas(frutasOrdenadas);
+        });
+    }
+    if (btnPrecioAsc){
+        btnPrecioAsc.addEventListener("click", () => { // Ordenar por precio de menor a mayor
+            const frutasOrdenadas = [...frutas].sort((a, b) => a.precio - b.precio);
+            cargarFrutas(frutasOrdenadas);
+        });
+    }
+    if (btnPrecioDesc){
+        btnPrecioDesc.addEventListener("click", () => { // Ordenar por precio de mayor a menor
+            const frutasOrdenadas = [...frutas].sort((a, b) => b.precio - a.precio);
+            cargarFrutas(frutasOrdenadas);
+        });
+    }
+
+}
 
 
 // funcion q se ejecuta al cargar la pagina
@@ -283,6 +316,8 @@ function init() {
         filtrarFrutas();
         //cargo la fun mostrar carrito
         mostrarCarrito();
+        //cargo la funcion de ordenamiento
+        ordenarFrutas(); // Ordeno por precio de menor a mayor al cargar la página
 }
     
     
