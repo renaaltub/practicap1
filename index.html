@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de frutas</title>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+
+        <a href="index.html">
+            <div class="logo">Frutería</div>
+        </a>
+        <!-- modifique a nav para mostrar el nombre del alumno -->
+        <nav class="nombreAlumno"></nav>
+        
+        <input type="text" placeholder="Buscar..." class="barra-busqueda">
+        
+        <div class="carrito">
+            <span>Carrito: <span id="contador-carrito">0</span> productos</span>
+        </div>
+    </header>
+
+    
+    <!-- Contenedor principal -->
+    <main>
+		<section class="seccion-productos">
+		    <h2>Nuestras frutas</h2>
+		    <div class="contenedor-productos"></div>
+		</section>
+
+		<!-- Seccion carrito -->
+		<section class="seccion-carrito">
+		    <h2>Carrito</h2>
+		    
+		    <div id="items-carrito">
+		        <p>No hay elementos en el carrito.</p>
+		    </div>
+
+		    <div class="total-carrito">
+		        <p>Total: <span id="precio-total">$0.00</span></p>
+		    
+		    </div>
+		</section>
+
+    </main>
+    <!--- agrego la sig linea para asociar al js-->
+    <script src="js/main.js"></script>
+</body>
+</html>
