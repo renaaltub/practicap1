@@ -122,9 +122,9 @@ function cargarFrutas(lista = frutas) {
             <img src="${fruta.img}" alt="${fruta.nombre}">
             <h3>${fruta.nombre}</h3>
             <p> $${fruta.precio}</p>
-            <button>Agregar al carrito</button>
+            <button class="btn-agregar">Agregar al carrito</button>
             `;
-            const botonAgregar = productoDiv.querySelector("button");
+            const botonAgregar = productoDiv.querySelector(".btn-agregar");
             botonAgregar.addEventListener("click", () => {
                 agregarAlCarrito(fruta);
             });
@@ -132,12 +132,13 @@ function cargarFrutas(lista = frutas) {
         contenedor.appendChild(productoDiv);
     })
 }
+
 // ej 4 funcion q filtre las frutas por nombre y muestre solo las q coincidan con el texto ingresado en la barra de busqueda
 function filtrarFrutas() {
     const inputBusqueda = document.querySelector(".barra-busqueda"); 
         if (!inputBusqueda) {
             console.warn("No se encontró el input con clase '.barra-busqueda'."); 
-        return; 
+            return; 
         }
         inputBusqueda.addEventListener("input", (e) => {
             //pasamos texto ingresado a minuscula para q no sea case sensitive
@@ -151,84 +152,27 @@ function filtrarFrutas() {
 // (2) incorporar la fun mostrarCarrito asociada al boton "Agregar al carrito" de cada producto,
 // (3) incorporar la funcion eliminarProducto asociada al btn del carrito.
 
-//primero creo un carrito
-const carrito = [];
+//ej 6, almacena los prd de carrito en localStorage 
+
+//aca buscamos los productos en el localStorage, o, creamos un array vacio
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
 //con esta agrego los preoductos a mi carrito (desp tengo q conectarlo con el boton "Agregar al carrito" de cada producto{en cargarFrutas()})
 function agregarAlCarrito(fruta) {
-    carrito.push(fruta);
-    console.log(`Producto agregado al carrito: ${fruta.nombre}`);
-    console.log(`Carrito actual:`, carrito);
-    mostrarCarrito();
-    guardarCarritoEnStorage(); // Guardar el carrito en localStorage después de agregar un producto
-    // Verificar si el producto ya existe en el carrito
+       // Verificar si el producto ya existe en el carrito
     const itemExistente = carrito.find(item => item.id === fruta.id);
     if (itemExistente) {
         itemExistente.cantidad += 1;
     } else {
         carrito.push({ ...fruta, cantidad: 1 });
     }
-}
 
-function mostrarCarrito() {
-    const carritoFrutas = document.getElementById("items-carrito");
-    const contadorCarrito = document.getElementById("contador-carrito");
-    const totalCarrito = document.getElementById("total-carrito");
-    const precioTotal = document.querySelector("precio-total");
-    
-    if (!carritoFrutas) return; // Verifico si el elemento existe antes de continuar
+    console.log(`Producto agregado al carrito: ${fruta.nombre}`);
+    console.log(`Carrito actual:`, carrito);
 
-    carritoFrutas.innerHTML = ""; // limpio el contenedor del carrito antes de mostrar los productos
+    mostrarCarrito();
+    guardarCarritoEnStorage(); // Guardar el carrito en localStorage después de agregar un producto
 
-    if (carrito.length === 0) {
-        carritoFrutas.innerHTML = "<p>El carrito está vacío</p>";
-        if(contadorCarrito) contadorCarrito.textContent = "0";
-        if(totalCarrito) totalCarrito.textContent = "$0";
-        return;
-    }
-    //creo lista ul para contener los productos del carrito
-    const listaCarrito = document.createElement("ul");
-    listaCarrito.classList.add("lista-carrito");
-    let total = 0;
-    let contador = 0;
-    //recorro el carrito y creo un li para cada producto
-    carrito.forEach((fruta, index) => {
-        const cantidad = fruta.cantidad || 1; // Si no tiene cantidad, asumimos que es 1
-        const subtotal = fruta.precio * cantidad;
-        total += subtotal;
-        contador += cantidad;
-
-        const itemCarrito = document.createElement("li");
-        itemCarrito.classList.add("bloque-item");
-        itemCarrito.innerHTML = `
-            <span>${fruta.nombre} - $${fruta.precio}</span>
-            <button class="btn-sumar">+</button>
-            <span>${cantidad}</span>
-            <button class="btn-restar">-</button>
-            <button class="btn-eliminar" data-index="${index}">Eliminar</button>
-        `;
-
-        itemCarrito.querySelector("btn-sumar").addEventListener("click", () => {
-            aumentarCantidad(fruta.id);
-        });
-        itemCarrito.querySelector("btn-restar").addEventListener("click", () => {
-            disminuirCantidad(fruta.id);
-        });
-
-        //preparo el boton eliminar para q elimine el producto del carrito
-        const botonEliminar = itemCarrito.querySelector(".btn-eliminar");
-        botonEliminar.addEventListener("click", () => {
-            eliminarDelCarrito(index);
-        });
-        listaCarrito.appendChild(itemCarrito);
-    });
-    carritoFrutas.appendChild(listaCarrito);
-
-    // actualizo el contador y total del carrito
-    if(contadorCarrito) contadorCarrito.textContent = carrito.length;
-    if(precioTotal) precioTotal.textContent = `$${total}`;
-
-    
 }
 
 function eliminarDelCarrito(indice) {
@@ -239,15 +183,6 @@ function eliminarDelCarrito(indice) {
     mostrarCarrito();
 }
 
-//ej 6, almacena los prd de carrito en localStorage 
-
-//aca buscamos los productos en el localStorage, o, creamos un array vacio
-let carritoStorage = JSON.parse(localStorage.getItem("carrito")) || [];
-
-// esto lo q hace es sincronizar los cambios en el almacenamiento local
-function guardarCarritoEnStorage() {
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-}
 //ej 7 nuevo btn de cantidades
 function aumentarCantidad(id) {
     const item = carrito.find(fruta => fruta.id === id);
@@ -269,6 +204,85 @@ function disminuirCantidad(id) {
             mostrarCarrito();
         }
     }
+}
+
+
+function mostrarCarrito() {
+    const carritoFrutas = document.getElementById("items-carrito");
+    const contadorCarrito = document.getElementById("contador-carrito");
+    const totalCarrito = document.querySelector(".total-carrito");
+    const precioTotal = document.getElementById("precio-total");
+    const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
+    
+    if (!carritoFrutas) return; // Verifico si el elemento existe antes de continuar
+
+    carritoFrutas.innerHTML = ""; // limpio el contenedor del carrito antes de mostrar los productos
+    //estando vacio
+    if (carrito.length === 0) {
+        carritoFrutas.innerHTML = `
+        <div class="estado-carrito-vacio">  
+        <img src="img/carro.png" alt="Carrito vacío" class="carrito-vacio">
+        <p>No hay productos en el carrito</p> 
+        </div> 
+        `;
+    
+    if(contadorCarrito) contadorCarrito.textContent = "0";
+    if(precioTotal) precioTotal.textContent = "0";
+    if (totalCarrito) totalCarrito.style.display = "none";
+    if (btnVaciarCarrito) btnVaciarCarrito.style.display = "none"; 
+    return;
+    };
+
+    if (totalCarrito) totalCarrito.style.display = "flex";
+    if (btnVaciarCarrito) btnVaciarCarrito.style.display = "inline-block";
+
+
+    //creo lista ul para contener los productos del carrito
+    const listaCarrito = document.createElement("ul");
+    listaCarrito.classList.add("lista-carrito");
+
+    let total = 0;
+    let contador = 0;
+
+    //recorro el carrito y creo un li para cada producto
+    carrito.forEach((fruta, index) => {
+        const cantidad = fruta.cantidad || 1; // Si no tiene cantidad, asumimos que es 1
+        const subtotal = fruta.precio * cantidad;
+        total += subtotal;
+        contador += cantidad;
+
+        const itemCarrito = document.createElement("li");
+        itemCarrito.classList.add("bloque-item");
+        itemCarrito.innerHTML = `
+            <span>${fruta.nombre} - $${fruta.precio}</span>
+            <button class="btn-sumar">+</button>
+            <span>${cantidad}</span>
+            <button class="btn-restar">-</button>
+            <button class="btn-eliminar" data-index="${index}">Eliminar</button>
+        `;
+
+        itemCarrito.querySelector(".btn-sumar").addEventListener("click", () => {
+            aumentarCantidad(fruta.id);
+        });
+        itemCarrito.querySelector(".btn-restar").addEventListener("click", () => {
+            disminuirCantidad(fruta.id);
+        });
+
+        //preparo el boton eliminar para q elimine el producto del carrito
+        const botonEliminar = itemCarrito.querySelector(".btn-eliminar");
+        botonEliminar.addEventListener("click", () => {
+            eliminarDelCarrito(index);
+        });
+
+        listaCarrito.appendChild(itemCarrito);
+    });
+
+    carritoFrutas.appendChild(listaCarrito);
+
+    // actualizo el contador y total del carrito
+    if(contadorCarrito) contadorCarrito.textContent = contador;
+    if(precioTotal) precioTotal.textContent = `$${total}`;
+
 }
 
 //ej 8, ordenar frutas por precio de menor a mayor y de mayor a menor y de az y za
@@ -306,6 +320,27 @@ function ordenarFrutas(){
 
 }
 
+//ej 9, vaciar carrito, si no hsay productos en el carrito, mostrar img/gif carrito vacio
+function vaciarCarrito() {
+    // vacio el array carrito y lo guardo en el localStorage
+    carrito.length = 0;   
+    guardarCarritoEnStorage();
+    mostrarCarrito();
+}
+
+function confBtnVaciar() {
+const btnVaciarCarrito = document.getElementById("btn-vaciar-carrito");
+    if (btnVaciarCarrito) {
+        btnVaciarCarrito.addEventListener("click", vaciarCarrito);
+    }
+}
+
+// esto lo q hace es sincronizar los cambios en el almacenamiento local
+function guardarCarritoEnStorage() {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+
 
 // funcion q se ejecuta al cargar la pagina
 function init() { 
@@ -314,10 +349,12 @@ function init() {
         cargarFrutas();
         //cargo la funcion del buscador
         filtrarFrutas();
-        //cargo la fun mostrar carrito
-        mostrarCarrito();
         //cargo la funcion de ordenamiento
         ordenarFrutas(); // Ordeno por precio de menor a mayor al cargar la página
+        confBtnVaciar();
+        //cargo la fun mostrar carrito
+        mostrarCarrito();
+
 }
     
     
